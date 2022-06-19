@@ -54,9 +54,9 @@
  
 
 ### Frontend client: 
-* [Install npm  and Node.js (14+ version)](https://nodejs.dev/learn/how-to-install-nodejs)
-
-* Start frontend-client from terminal: 
+* Використовується React версії 18.2
+* Для запуску потрібно встановити npm і Node.js 14+ версії ([інструкції встановлення](https://nodejs.dev/learn/how-to-install-nodejs))
+* Після цього для запуску фронтенд-клієнта, в терміналі перебуваючи в корневій папці проекта потрібно ввести: 
   ```
   cd frontend-client
   npm start
