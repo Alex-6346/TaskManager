@@ -1,5 +1,6 @@
 package service;
 
+import entity.CategoryEntity;
 import entity.TaskDto;
 import entity.TaskEntity;
 import entity.UserEntity;
@@ -8,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import repository.CategoriesRepository;
 import repository.TasksRepository;
 import repository.UsersRepository;
 
@@ -19,14 +21,16 @@ public class TasksService {
 
     private final TasksRepository tasksRepository;
     private final UsersRepository usersRepository;
+    private final CategoriesRepository categoriesRepository;
 
     @Transactional
     public TaskEntity createTask(TaskDto taskDto) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = ((UserDetails) principal).getUsername();
         UserEntity user = usersRepository.findByEmail(email).orElse(null);
+        CategoryEntity category = categoriesRepository.findByName(taskDto.getCategory()).orElse(null);
 
-        TaskEntity taskEntity = new TaskEntity(taskDto,user);
+        TaskEntity taskEntity = new TaskEntity(taskDto,user,category);
         return tasksRepository.saveAndFlush(taskEntity);
     }
 
@@ -49,7 +53,8 @@ public class TasksService {
     @Transactional
     public TaskEntity updateTask(TaskDto taskDto) {
         UserEntity user = usersRepository.findById(taskDto.getUser()).orElse(null);
-        TaskEntity taskEntity = new TaskEntity(taskDto,user);
+        CategoryEntity category = categoriesRepository.findByName(taskDto.getCategory()).orElse(null);
+        TaskEntity taskEntity = new TaskEntity(taskDto,user,category);
         return  tasksRepository.saveAndFlush(taskEntity);
     }
 

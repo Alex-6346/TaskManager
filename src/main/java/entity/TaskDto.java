@@ -26,6 +26,9 @@ public class TaskDto {
 
     private Long user;
 
+    @NotNull(message = "Category cannot be null")
+    private String category;
+
 
     public TaskDto(TaskEntity taskEntity) {
         this.id = taskEntity.getId();
@@ -33,6 +36,6 @@ public class TaskDto {
         this.description = taskEntity.getDescription();
         this.date = taskEntity.getDate();
         this.user = taskEntity.getUser().getId();
-
+        this.category=taskEntity.getCategory().getName();
     }
 }

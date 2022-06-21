@@ -35,7 +35,13 @@ public class TaskEntity {
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private UserEntity user;
 
-    public TaskEntity(TaskDto taskDto, UserEntity user){
+    @ManyToOne
+    @JoinTable(name = "tasks_to_category",
+            joinColumns = @JoinColumn(name = "task_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private CategoryEntity category;
+
+    public TaskEntity(TaskDto taskDto, UserEntity user, CategoryEntity category){
         if(!Objects.isNull(taskDto.getId())){
             this.id=taskDto.getId();
         }
@@ -43,6 +49,7 @@ public class TaskEntity {
         this.description=taskDto.getDescription();
         this.date=taskDto.getDate();
         this.user=user;
+        this.category=category;
     }
 
 

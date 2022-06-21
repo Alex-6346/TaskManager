@@ -35,6 +35,12 @@ public class UserEntity {
             inverseJoinColumns = @JoinColumn(name = "task_id"))
     private List<TaskEntity> tasks;
 
+    @OneToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
+    @JoinTable(name = "categories_to_user",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private List<CategoryEntity> categories;
+
     public UserEntity(UserDto userDto){
         if(!Objects.isNull(userDto.getId())){
             this.id=userDto.getId();
