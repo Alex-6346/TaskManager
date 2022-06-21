@@ -29,6 +29,11 @@ public class UserEntity {
     @Column(name = "password")
     private String password;
 
+    @OneToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
+    @JoinTable(name = "tasks_to_user",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "task_id"))
+    private List<TaskEntity> tasks;
 
     public UserEntity(UserDto userDto){
         if(!Objects.isNull(userDto.getId())){
