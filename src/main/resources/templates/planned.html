@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="home.html" rel="import" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+</head>
+<body>
+<div layout:include="layouts/sidebar :: sidebar" th:remove="tag">
+    <div layout:fragment="page-content">
+        <form id='add-task' onsubmit="return false;">
+            <div class="form-group p-1">
+                <label for="taskName">Task: </label>
+                <input type="text" maxlength="80" class="form-control" id="taskName" >
+            </div>
+
+            <div class="row p-2">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="category"> Select task category: </label>
+                        <select class="form-control" id="category">
+<!--                            <option> Taxes</option>>-->
+<!--                            <option> Job </option>>-->
+                        </select>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                    <label for="datepicker"> Date: </label>
+                    <br>
+                    <input type="text" class="form-control" id="datepicker">
+                    </div>
+                </div>
+            </div>
+            <div class="md-form blue-textarea active-blue-textarea p-2">
+                <label for="description"> Description: </label>
+                <textarea class="form-control" id="description" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" id="button"> Submit </button>
+        </form>
+
+        <br>
+        <br>
+
+        <li id="task" class="list-group-item d-flex align-items-center border-0 mb-2 rounded"
+            style="background-color: #f4f6f7;">
+                <div class="col-auto">
+                    <input class="form-check-input me-2" type="checkbox" value="" aria-label="..." />
+                    <label>Pay taxes </label >
+                </div>
+                <div class="ms-auto col-auto">
+                    <span  style="font-size:12px;" class="badge bg-secondary">  Bills </span>
+                </div>
+                <div class="offset-1 col-auto">
+                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editTask"
+                            id="tDSask" value="TERT"> View/Edit </button>
+                </div>
+        </li>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editTask">
+            Launch static backdrop modal
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="editTask" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog  modal-dialog-centered  modal-dialog-scrollable">
+                <div class="modal-content">
+<!--                    <div class="modal-header">-->
+<!--                        <h5 contenteditable="true" class="modal-title" id="staticBackdropLabel">Modal title</h5>-->
+<!--                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
+<!--                    </div>-->
+                    <div class="modal-body">
+                        <form id='edit-task' onsubmit="return false;">
+                            <div class="form-group p-1">
+                                <label for="taskName">Task: </label>
+                                <input type="text" maxlength="80" class="form-control" id="editTaskName" >
+                            </div>
+
+                            <div class="row p-2">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label for="category"> Select task category: </label>
+                                        <select class="form-control" id="editCategory">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label for="datepicker"> Date: </label>
+                                        <br>
+                                        <input type="text" class="form-control" id="editDatepicker">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="md-form blue-textarea active-blue-textarea p-2">
+                                <label for="description"> Description: </label>
+                                <textarea class="form-control" id="editDescription" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="editButton"> Submit </button>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Understood</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container" id="tasksContainer">
+
+        </div>
+    </div>
+</div>
+<div id="'test"></div>
+<script>
+    $( function() {
+        $( "#datepicker" ).datepicker(
+            {
+                minDate: 0,
+                dateFormat: 'dd-mm-yy'
+            }
+        );
+    } );
+
+    jQuery(document).ready(function($) {
+        $.ajax({
+            type: 'GET',
+            url: '/categories/names',
+            success: function (data) {
+                console.log(data)
+                data.forEach(function(category){
+                  $('#category').append(new Option(category))
+                })
+            }
+        })
+    });
+
+    $('#add-task').submit(function(e){
+        e.preventDefault()
+        $.ajax({
+            type: 'POST',
+            url: '/tasks/add',
+            datatype: 'json',
+            data: JSON.stringify({
+                    name: $('#taskName').val(),
+                    description: $('#description').val(),
+                    category: $('#category').val(),
+                    date: $('#datepicker').val()
+                }
+            ), beforeSend: function (xhr) {
+                xhr.setRequestHeader('Content-Type', 'application/json')
+            },
+            success: function () {
+                showTasks()
+                $('#add-task')[0].reset()
+            }
+
+        })
+    })
+
+    function showTasks(){
+        $.ajax({
+          type: 'GET',
+          url: 'tasks/show-tasks',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('Content-Type', 'application/json')
+            },
+            success: function (data) {
+                addTasksToPage(data)
+            }
+        })
+    }
+
+    function addTasksToPage(data) {
+        var dateTaskMap = new Map()
+        data.forEach(function (task) {
+                if (dateTaskMap.get(task.date) === undefined) {
+                    dateTaskMap.set(task.date, [task])
+                } else {
+                    let dateTasks = dateTaskMap.get(task.date)
+                    dateTasks.push(task)
+                    dateTaskMap.set(task.date, dateTasks)
+                }
+            }
+        )
+        const sortedMap = new Map([...dateTaskMap.entries()].sort((a, b) => a[1] - b[1]));
+        $('#tasksContainer').empty()
+
+        sortedMap.forEach((value, key, map) => {
+            $('#tasksContainer').append(`<h3> ${key} </h3>`)
+            $('#tasksContainer').append(`<ul id="${key}"> </ul>`)
+
+            value.forEach(function(task){
+                    var body = ' <li id=\"task' + task.id +'\" class="list-group-item d-flex align-items-center border-0 mb-2 rounded"\n' +
+                        '            style="background-color: #f4f6f7;">\n' +
+                        '                <div class="col-auto">\n' +
+                        '                    <input class="form-check-input me-2" type="checkbox" value="" aria-label="..." />\n' +
+                        '                    <label>' + task.name + '</label >\n' +
+                        '                </div>\n' +
+                        '                <div class="ms-auto col-auto">\n' +
+                        '                    <span  style="font-size:12px;" class="badge bg-secondary">  Bills </span>\n' +
+                        '                </div>\n' +
+                        '                <div class="offset-1 col-auto">\n' +
+                        '                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editTask"\n' +
+                        '                            id="' + task.id + '" value="' + task.id + '"> View/Edit </button>\n' +
+                        '                </div>\n' +
+                        '        </li>'
+                        // '<li id=\"task\" class=\"list-group-item border-0 mb-2 rounded\"\n' +
+                        // '            style=\"background-color: #f4f6f7;\">' +
+                        // '<row>' +
+                        // '<div class="col-auto">            <input class=\"form-check-input me-2\" type=\"checkbox\" value=\"\" aria-label=\"...\"/>' +
+                        // '            <label>' +task.name + '</label > ' +
+                        // '</div>' +
+                        // '<div class="ms-auto col-auto"><span  style=\"font-size:10px;\" class=\"badge bg-secondary\">' +  task.category + '</span> </div>' +
+                        // '<div class="offset-1 col-auto"><button type=\"button\" class="btn btn-secondary btn-sm" data-bs-toggle="modal" ' +
+                        // 'data-bs-target="#editTask" id=\"task' + task.id +'\" value=\"' + task.id +'\"> View/Edit </button> </div>     ' +
+                        // '</row>  </li>';
+                    $(`#${key}`).append(body)
+                }
+            )
+        })
+    }
+
+    // })
+</script>
+<!--end of Navigation bar-->
+</body>
+</html>
