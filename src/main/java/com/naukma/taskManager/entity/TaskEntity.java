@@ -56,6 +56,7 @@ public class TaskEntity {
         this.description=taskDto.getDescription();
         this.date=taskDto.getDate();
         this.user=user;
+        this.completed=taskDto.getCompleted();
         this.category=category;
     }
 

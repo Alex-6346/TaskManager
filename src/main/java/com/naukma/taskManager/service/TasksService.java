@@ -5,6 +5,7 @@ import com.naukma.taskManager.entity.TaskDto;
 import com.naukma.taskManager.entity.TaskEntity;
 import com.naukma.taskManager.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -13,14 +14,20 @@ import com.naukma.taskManager.repository.CategoriesRepository;
 import com.naukma.taskManager.repository.TasksRepository;
 import com.naukma.taskManager.repository.UsersRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class TasksService {
 
+    @Autowired
     private final TasksRepository tasksRepository;
+
+    @Autowired
     private final UsersRepository usersRepository;
+
+    @Autowired
     private final CategoriesRepository categoriesRepository;
 
     @Transactional
@@ -51,6 +58,26 @@ public class TasksService {
     }
 
     @Transactional
+    public List<TaskEntity> findUserNotOverdueTasks(UserEntity userEntity) {
+        return tasksRepository.findNotOverdueTasks(userEntity, LocalDate.now());
+    }
+
+    @Transactional
+    public List<TaskEntity> findUserTodayIncompleteTasks(UserEntity userEntity){
+        return tasksRepository.findTodayTasks(userEntity, LocalDate.now(), false);
+    }
+
+    @Transactional
+    public List<TaskEntity> findUserTodayCompletedTasks(UserEntity userEntity){
+        return tasksRepository.findTodayTasks(userEntity, LocalDate.now(),true);
+    }
+
+    @Transactional
+    public List<TaskEntity> findUserOverdueTasks(UserEntity userEntity) {
+        return tasksRepository.getOverdueTasks(userEntity, LocalDate.now());
+    }
+
+    @Transactional
     public TaskEntity updateTask(TaskDto taskDto) {
         UserEntity user = usersRepository.findById(taskDto.getUser()).orElse(null);
         CategoryEntity category = categoriesRepository.findByName(taskDto.getCategory()).orElse(null);
@@ -58,8 +85,11 @@ public class TasksService {
         return  tasksRepository.saveAndFlush(taskEntity);
     }
 
+
+
     @Transactional
     public void deleteTask(TaskDto taskDto) {
-        tasksRepository.deleteTaskEntityById(taskDto.getId());
+        tasksRepository.deleteTask(taskDto.getId());
+//        tasksRepository.deleteTaskEntityById(taskDto.getId());
     }
 }

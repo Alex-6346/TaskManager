@@ -38,13 +38,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin().permitAll()
-                .defaultSuccessUrl("/", true)
+                .defaultSuccessUrl("/alltasks", true)
                 .and()
                 .logout().permitAll()
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                .logoutSuccessUrl("/login")
-                .invalidateHttpSession(true)// set invalidation state when logout
-                .deleteCookies("JSESSIONID");
+                .logoutSuccessUrl("/login");
+//                .invalidateHttpSession(true)// set invalidation state when logout
+//                .deleteCookies("JSESSIONID");
     }
 
     @Bean

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My day</title>
+    <link href="home.html" rel="import" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+
+</head>
+<body>
+<div layout:include="layouts/sidebar :: sidebar" th:remove="tag">
+    <div layout:fragment="page-content">
+        <div th:include="fragments/category-fragment :: add-category-menu"> </div>
+        <div th:include="fragments/task-fragment :: add-task-menu"> </div>
+        <div class="container" id="tasksContainer">
+        <script>
+                jQuery(document).ready(function() {
+                    showMyDayTasks()
+                });
+
+                $('#add-category').submit(function(e){
+                    e.preventDefault()
+                    addCategoryRequest(function(){
+                        updateCategories('#category')
+                        $('#add-category')[0].reset()
+                    })
+                })
+
+                $('#add-task').submit(function (e){
+                    e.preventDefault()
+                    addTaskRequest(function (){
+                        showMyDayTasks()
+                        $('#add-task')[0].reset()
+                    })
+                })
+
+                function showMyDayTasks(){
+                    $('#tasksContainer').empty()
+                    $.ajax({
+                        type: 'GET',
+                        url: 'tasks/today-incomplete-tasks',
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader('Content-Type', 'application/json')
+                        },
+                        success: function (data) {
+                            addTasks(data, 'Incomplete')
+                        }
+                    })
+
+                    $.ajax({
+                        type: 'GET',
+                        url: 'tasks/today-completed-tasks',
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader('Content-Type', 'application/json')
+                        },
+                        success: function (data) {
+                            addTasks(data, 'Completed')
+                        }
+                    })
+                }
+
+                // function addIncompleteTasks(tasks){
+                //     $('#tasksContainer').append(`<h3> Incomplete:  </h3>`)
+                //     $('#tasksContainer').append(`<ul id="incomplete"> </ul>`)
+                //     tasks.forEach(function(task){
+                //         addTaskToView(task, 'incomplete', showMyDayTasks)
+                //     })
+                // }
+
+                function addTasks(tasks, listName){
+                    if(tasks.length > 0) {
+                        $('#tasksContainer').append(`<h3> ${listName}:  </h3>`)
+                    }
+                    const lower = listName.toLowerCase();
+                    $('#tasksContainer').append(`<ul id="${lower}"> </ul>`)
+                    tasks.forEach(function(task){
+                        addTaskToView(task, lower, showMyDayTasks)
+                    })
+                }
+            </script>
+    </div>
+</div>
+</div>>
+</body>
+</html>

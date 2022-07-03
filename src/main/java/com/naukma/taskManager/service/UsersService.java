@@ -16,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UsersService {
 
+    @Autowired
     private final UsersRepository usersRepository;
 
     @Autowired

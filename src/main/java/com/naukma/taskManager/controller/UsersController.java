@@ -32,7 +32,4 @@ public class UsersController {
         usersService.deleteUser(userEntity);
         return  ResponseEntity.status(HttpStatus.OK).body(new UserDto(userEntity));
     }
-
-
-
 }

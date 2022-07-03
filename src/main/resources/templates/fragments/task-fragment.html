@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="add-task-menu">
+    <div class="d-grid gap-3 col-6 mx-auto p-3">
+        <button class="btn btn-primary" type="button" id="toggle-tasks">
+            Add task </button>
+    </div>
+    <form id='add-task' onsubmit="return false;">
+        <div class="form-group p-1">
+            <label for="taskName">Task: </label>
+            <input type="text" maxlength="80" class="form-control" id="taskName" >
+        </div>
+        <div class="row p-2">
+            <div class="col">
+                <div class="form-group">
+                    <label for="category"> Select task category: </label>
+                    <select class="form-control" id="category">
+                    </select>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="datepicker"> Date: </label>
+                    <br>
+                    <input type="text" class="form-control" id="datepicker">
+                </div>
+            </div>
+        </div>
+        <div class="md-form blue-textarea active-blue-textarea p-2">
+            <label for="description"> Description: </label>
+            <textarea class="form-control" maxlength="1024" id="description" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" id="button"> Submit </button>
+    </form>
+
+
+    <div class="modal fade" id="editTask" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-centered  modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form id='edit-task' onsubmit="return false;">
+                        <div class="form-group p-1">
+                            <label for="editTaskName">Task: </label>
+                            <input type="text" maxlength="80" class="form-control" id="editTaskName" >
+                        </div>
+
+                        <div class="row p-2">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="editCategory"> Select task category: </label>
+                                    <select class="form-control" id="editCategory">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="editDatepicker"> Date: </label>
+                                    <br>
+                                    <input type="text" class="form-control" id="editDatepicker">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="md-form blue-textarea active-blue-textarea p-2">
+                            <label for="editDescription"> Description: </label>
+                            <textarea class="form-control" id="editDescription" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id='saveButton' type="button" class="btn btn-primary"> Save </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+
+        jQuery(document).ready(function() {
+            $('#add-task').toggle()
+            updateCategories('#category')
+        });
+
+        $('#toggle-tasks').click(function (){
+            toggleAddTask()
+        })
+
+        function toggleAddTask(){
+            $('#add-task').toggle('slow')
+        }
+
+        $( function() {
+            $( "#datepicker" ).datepicker(
+                {
+                    minDate: 0,
+                    dateFormat: 'dd-mm-yy',
+                }
+            ).datepicker("setDate", "now");
+        } );
+
+        $(function() {
+            $( "#editDatepicker" ).datepicker(
+                {
+                    minDate: 0,
+                    dateFormat: 'dd-mm-yy'
+                }
+            );
+        } );
+
+        function updateCategories(selectID){
+            $(selectID).empty()
+            $.ajax({
+                type: 'GET',
+                url: '/categories/names',
+                success: function (data) {
+                    console.log(data)
+                    data.forEach(function(category){
+                        $(selectID).append(new Option(category))
+                    })
+                }
+            })
+        }
+
+        function addTaskRequest(successFun) {
+            $.ajax({
+                type: 'POST',
+                url: '/tasks/add',
+                datatype: 'json',
+                data: JSON.stringify({
+                        name: $('#taskName').val(),
+                        description: $('#description').val(),
+                        category: $('#category').val(),
+                        date: $('#datepicker').val(),
+                        completed: false
+                    }
+                ), beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Content-Type', 'application/json')
+                },
+                success: successFun
+            })
+        }
+
+        function addTaskToView(task, listID, showTasksFun, dateBadge=""){
+            $(`#${listID}`).append(createTaskView(task, dateBadge))
+            $('#' + task.id).click(function(){handleUpdateTask(task, showTasksFun)})
+            $(`#rm${task.id}`).click(function (){handleDeleteTask(task, showTasksFun)})
+            $(`#check${task.id}`).change(function (){
+                if(this.checked){
+                    task.completed = true
+                    updateTaskRequest(task, showTasksFun)
+                } else{
+                    task.completed = false
+                    updateTaskRequest(task, showTasksFun)
+                }
+            })
+
+        }
+
+        function createTaskView(task, dateBadge){
+            var checked = ""
+            if(task.completed){
+                checked = "checked"
+            }
+            console.log(task)
+            console.log(checked)
+            return ' <li id=\"task' + task.id +'\" class="list-group-item d-flex align-items-center border-0 mb-2 rounded"\n' +
+                '            style="background-color: #f4f6f7;">\n' +
+                '                <div class="col-auto">\n' +
+                '                    <input id="check' + task.id + '" class="form-check-input me-2" type="checkbox" value="" aria-label="..."  aria-checked="true" ' + checked + '/>\n' +
+                '                    <label>' + task.name + '</label >\n' +
+                '                </div>\n' +
+                dateBadge +
+                '                <div class="ms-auto col-auto">\n' +
+                '                    <span  style="font-size:12px;" class="badge bg-secondary"> ' + task.category + '</span>\n' +
+                '                </div>\n' +
+                '                <div class="offset-1 col-auto">\n' +
+                '                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editTask"\n' +
+                '                            id="' + task.id + '" value="' + task.id + '"> View/Edit </button>\n' +
+                '                </div>\n' +
+                '<div class="offset-1 col-auto">\n' +
+                '                    <button type="button" class="btn btn-outline-danger btn-sm" \n' +
+                '                            id="rm' + task.id + '" value="' + task.id + '"> Delete </button>\n' +
+                '                </div>\n' +
+                '        </li>'
+        }
+
+        function handleUpdateTask(task, showTasksFun){
+            updateViewModalFields(task)
+            $('#saveButton').click(function (){
+                task.name = $('#editTaskName').val()
+                task.description =  $('#editDescription').val()
+                task.category = $('#editCategory').val()
+                task.date = $('#editDatepicker').val()
+                updateTaskRequest(task, showTasksFun)})
+        }
+
+        function updateViewModalFields(task){
+            updateCategories('#editCategory')
+            $('#editTaskName').val(task.name)
+            $('#editCategory').val(task.category)
+            $('#editDatepicker').val(date)
+            $('#editDescription').val(task.description)
+
+            $('#saveButton').click(function (){updateTaskRequest(task)})
+        }
+
+        function updateTaskRequest(task, successFun){
+            $.ajax({
+                type: 'PUT',
+                url: '/tasks/update/',
+                datatype: 'json',
+                data: JSON.stringify({
+                        id: task.id,
+                        name: task.name,
+                        description: task.description,
+                        completed: task.completed,
+                        category: task.category,
+                        date: task.date
+                    }
+                ), beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Content-Type', 'application/json')
+                },
+                success: successFun
+            })
+        }
+
+        function handleDeleteTask(task, successFun) {
+            $.ajax({
+                type: 'DELETE',
+                url: '/tasks/delete',
+                datatype: 'json',
+                data: JSON.stringify({
+                        id: task.id,
+                        name: task.name,
+                        description: task.description,
+                        category: task.category,
+                        date: task.date
+                    }
+                ), beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Content-Type', 'application/json')
+                },
+                success: successFun
+            })
+        }
+
+    </script>
+</div>
+</body>
+</html>

@@ -21,16 +21,38 @@ public class AppController {
     @Autowired
     private CategoriesService categoriesService;
 
-    @GetMapping("/")
+    @GetMapping("/alltasks")
     public String homePage(Model model) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = ((UserDetails) principal).getUsername();
+        UserEntity user = usersService.getUserByEmail(email);
+        System.out.println(user.getCategories().isEmpty());
+        if(user.getCategories().isEmpty()) {
+            System.out.println("empty");
+            CategoryDto categoryDto = new CategoryDto();
+            categoryDto.setName("Bills");
+            categoryDto.setDescription("test desr");
+            categoryDto.setUser(user.getId());
+            categoriesService.createCategory(categoryDto);
+        }
+        return "planned";
+    }
+
+    @GetMapping("/myday")
+    public String myDayPage(Model model) {
         System.out.println("Home");
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = ((UserDetails) principal).getUsername();
         UserEntity user = usersService.getUserByEmail(email);
-        categoriesService.createCategory(new CategoryDto(1, "dsadsa", "dsfafadfsda", new Long(1)));
-        System.out.println(categoriesService.findAllCategories());
-        System.out.println(categoriesService.findAllCategoriesByUser(user));
-        return "planned";
+//        if(user.getCategories().isEmpty()) {
+//            CategoryDto categoryDto = new CategoryDto();
+//            categoryDto.setName("Bills");
+//            categoryDto.setDescription("test desr");
+//            categoryDto.setUser(user.getId());
+//            categoriesService.createCategory(categoryDto);
+//        }
+        return "myday";
     }
+
 
 }

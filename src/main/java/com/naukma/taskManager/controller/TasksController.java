@@ -27,11 +27,6 @@ public class TasksController {
     @Autowired
     private TasksService tasksService;
 
-//    @GetMapping("/add")
-//    public String addTaskPage(Model model) {
-//        return "task-add";
-//    }
-
     @PostMapping("/add")
     @ResponseBody
     public ResponseEntity<TaskDto> addTask(@RequestBody TaskDto taskDto) {
@@ -51,12 +46,30 @@ public class TasksController {
         return "task-page";
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     @ResponseBody
-    public ResponseEntity<TaskDto> updateTask(Model model, @RequestBody TaskDto taskDto){
+    public ResponseEntity<TaskDto> updateTask(@RequestBody TaskDto taskDto){
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = ((UserDetails) principal).getUsername();
+        System.out.println("Update tasks: ");
+        System.out.println(taskDto);
+        UserEntity user = usersService.getUserByEmail(email);
+        taskDto.setUser(user.getId());
         TaskEntity taskEntity = tasksService.updateTask(taskDto);
-        model.addAttribute("taskInfo", taskEntity);
         taskDto.setId(taskEntity.getId());
+
+        return  ResponseEntity.status(HttpStatus.OK).body(taskDto);
+    }
+
+    @DeleteMapping("/delete")
+    @ResponseBody
+    public ResponseEntity<TaskDto> deleteTask(@RequestBody TaskDto taskDto){
+        System.out.println("Delete");
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = ((UserDetails) principal).getUsername();
+        UserEntity user = usersService.getUserByEmail(email);
+        taskDto.setUser(user.getId());
+        tasksService.deleteTask(taskDto);
         return  ResponseEntity.status(HttpStatus.OK).body(taskDto);
     }
 
@@ -76,18 +89,46 @@ public class TasksController {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = ((UserDetails) principal).getUsername();
         UserEntity user = usersService.getUserByEmail(email);
-        return tasksService.findAllTasksOfUser(user).stream().map(this::convertToDto).collect(Collectors.toList());
+        return tasksService.findUserNotOverdueTasks(user).stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    @ResponseBody
+    @GetMapping("/show-overdue-tasks")
+    public List<TaskDto> showOverdueTasks() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = ((UserDetails) principal).getUsername();
+        UserEntity user = usersService.getUserByEmail(email);
+        return tasksService.findUserOverdueTasks(user).stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    @ResponseBody
+    @GetMapping("/today-incomplete-tasks")
+    public List<TaskDto> showTodayIncompleteTasks() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = ((UserDetails) principal).getUsername();
+        UserEntity user = usersService.getUserByEmail(email);
+        return tasksService.findUserTodayIncompleteTasks(user).stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+
+    @ResponseBody
+    @GetMapping("/today-completed-tasks")
+    public List<TaskDto> showTodayCompletedTasks() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = ((UserDetails) principal).getUsername();
+        UserEntity user = usersService.getUserByEmail(email);
+        return tasksService.findUserTodayCompletedTasks(user).stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+
+    @ResponseBody
+    @GetMapping("/get/{id}")
+    public TaskDto task(Model model, @PathVariable(value="id") long id){
+        TaskEntity taskEntity = tasksService.getTaskById(id);
+        return new TaskDto(taskEntity);
     }
 
     private TaskDto convertToDto(TaskEntity task) {
         return new TaskDto(task);
     }
-
-    @PostMapping("/delete")
-    @ResponseBody
-    public ResponseEntity<TaskDto> deleteTask(Model model, @RequestBody TaskDto taskDto){
-        tasksService.deleteTask(taskDto);
-        return  ResponseEntity.status(HttpStatus.OK).body(taskDto);
-    }
-
 }

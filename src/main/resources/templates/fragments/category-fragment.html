@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="add-category-menu">
+    <div class="d-grid gap-3 col-6 mx-auto p-3">
+        <button class="btn btn-primary" type="button" id="toggle-category">
+            Add category</button>
+    </div>
+    <form id='add-category'  onsubmit="return false;">
+        <div class="form-group p-2">
+            <label for="categoryName">Category: </label>
+            <input type="text" maxlength="160" class="form-control" id="categoryName">
+        </div>
+        <div class="md-form blue-textarea active-blue   -textarea p-2">
+            <label for="categoryDescription"> Category description: </label>
+            <textarea class="form-control" maxlength="1024" id="categoryDescription" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary p-3" id="addCategoryButton"> Submit </button>
+    </form>
+<script>
+    $('#toggle-category').click(function (){
+        toggleAddCategory()
+    })
+
+    function toggleAddCategory(){
+        $('#add-category').toggle('slow')
+    }
+
+    jQuery(document).ready(function() {
+        $('#add-category').toggle()
+    });
+
+    function addCategoryRequest(successFun){
+        $.ajax({
+            type: 'POST',
+            url: '/categories/add',
+            datatype: 'json',
+            data: JSON.stringify({
+                    name: $('#categoryName').val(),
+                    description: $('#categoryDescription').val(),
+                }
+            ), beforeSend: function (xhr) {
+                xhr.setRequestHeader('Content-Type', 'application/json')
+            },
+            success: successFun
+        })
+    }
+</script>
+</div>
+</body>
+</html>

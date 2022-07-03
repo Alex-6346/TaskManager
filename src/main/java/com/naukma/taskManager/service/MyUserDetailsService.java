@@ -20,7 +20,7 @@ public class MyUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
         final UserEntity user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("No user with email: " + email));
-        System.out.println(user);
+
         return User.builder()
                 .username(email)
                 .password(user.getPassword())

@@ -24,11 +24,6 @@ public class CategoriesController {
     @Autowired
     private CategoriesService categoriesService;
 
-    @GetMapping("/")
-    public String HomePage(Model model) {
-        System.out.println("SASADSADSA");
-        return "home";
-    }
 
     @GetMapping("/add")
     public String addCategoryPage(Model model) {
@@ -38,6 +33,10 @@ public class CategoriesController {
     @PostMapping("/add")
     @ResponseBody
     public ResponseEntity<CategoryDto> addCategory(@RequestBody CategoryDto categoryDto) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = ((UserDetails) principal).getUsername();
+        UserEntity user = usersService.getUserByEmail(email);
+        categoryDto.setUser(user.getId());
         CategoryEntity categoryEntity = categoriesService.createCategory(categoryDto);
         categoryDto.setId(categoryEntity.getId());
         return  ResponseEntity.status(HttpStatus.OK).body(categoryDto);

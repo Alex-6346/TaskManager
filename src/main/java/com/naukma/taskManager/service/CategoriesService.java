@@ -4,6 +4,7 @@ import com.naukma.taskManager.entity.CategoryEntity;
 import com.naukma.taskManager.entity.CategoryDto;
 import com.naukma.taskManager.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoriesService {
 
+    @Autowired
     private final UsersRepository usersRepository;
+
+    @Autowired
     private final CategoriesRepository categoriesRepository;
 
     @Transactional

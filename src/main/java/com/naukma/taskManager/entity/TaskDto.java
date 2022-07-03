@@ -30,6 +30,8 @@ public class TaskDto {
 
     private Long user;
 
+    private Boolean completed;
+
     @NotNull(message = "Category cannot be null")
     private String category;
 
@@ -39,6 +41,7 @@ public class TaskDto {
         this.name = taskEntity.getName();
         this.description = taskEntity.getDescription();
         this.date = taskEntity.getDate();
+        this.completed = taskEntity.getCompleted();
         this.user = taskEntity.getUser().getId();
         this.category=taskEntity.getCategory().getName();
     }
