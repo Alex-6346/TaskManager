@@ -29,6 +29,19 @@ public class UsersService {
         return usersRepository.saveAndFlush(userEntity);
     }
 
+    public UserEntity registerUser(UserDto user) {
+        UserEntity newUser = new UserEntity(user);
+        //newUser.setPassword(BCrypt.hashpw(user.getPassword(), SaltStorage.SALT));
+
+        UserEntity sameUser = usersRepository.findByEmail(user.getEmail()).orElse(null);
+        if (sameUser == null) {
+            usersRepository.saveAndFlush(newUser);
+            return newUser;
+        } else {
+            return null;
+        }
+    }
+
     @Transactional
     public UserEntity getUserById(long id) {
         return usersRepository.findById(id).orElse(null);
