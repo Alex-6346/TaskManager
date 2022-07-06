@@ -39,19 +39,16 @@ public class AppController {
     }
 
     @GetMapping("/myday")
-    public String myDayPage(Model model) {
-        System.out.println("Home");
+    public String myDayPage() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = ((UserDetails) principal).getUsername();
         UserEntity user = usersService.getUserByEmail(email);
-//        if(user.getCategories().isEmpty()) {
-//            CategoryDto categoryDto = new CategoryDto();
-//            categoryDto.setName("Bills");
-//            categoryDto.setDescription("test desr");
-//            categoryDto.setUser(user.getId());
-//            categoriesService.createCategory(categoryDto);
-//        }
         return "myday";
+    }
+
+    @GetMapping("/completed")
+    public String completed(){
+        return "completed";
     }
 
 

@@ -5,6 +5,7 @@ import com.naukma.taskManager.entity.TaskDto;
 import com.naukma.taskManager.entity.TaskEntity;
 import com.naukma.taskManager.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -69,8 +70,24 @@ public class TasksService {
 
     @Transactional
     public List<TaskEntity> findUserTodayCompletedTasks(UserEntity userEntity){
-        return tasksRepository.findTodayTasks(userEntity, LocalDate.now(),true);
+        return tasksRepository.findTodayTasks(userEntity, LocalDate.now(), true);
     }
+
+    @Transactional
+    public List<TaskEntity> findUserOverdueTasksByCategory(UserEntity userEntity, Long categoryID){
+        return tasksRepository.findOverdueTasksByCategory(userEntity, categoryID, LocalDate.now());
+    }
+
+    @Transactional
+    public List<TaskEntity> findUserNotOverdueTasksByCategory(UserEntity userEntity, Long categoryID){
+        return tasksRepository.findNotOverdueTasksByCategory(userEntity, categoryID, LocalDate.now());
+    }
+
+    @Transactional
+    public List<TaskEntity> findUserCompletedTasksByDates(UserEntity userEntity, LocalDate from, LocalDate to){
+        return tasksRepository.findCompletedTasksByDates(userEntity, from, to);
+    }
+
 
     @Transactional
     public List<TaskEntity> findUserOverdueTasks(UserEntity userEntity) {
@@ -78,11 +95,11 @@ public class TasksService {
     }
 
     @Transactional
-    public TaskEntity updateTask(TaskDto taskDto) {
-        UserEntity user = usersRepository.findById(taskDto.getUser()).orElse(null);
+    public void updateTask(TaskDto taskDto) {
+//        UserEntity user = usersRepository.findById(taskDto.getUser()).orElse(null);
         CategoryEntity category = categoriesRepository.findByName(taskDto.getCategory()).orElse(null);
-        TaskEntity taskEntity = new TaskEntity(taskDto,user,category);
-        return  tasksRepository.saveAndFlush(taskEntity);
+        tasksRepository.updateTask(taskDto.getId(), taskDto.getName(),
+                category, taskDto.getDate(), taskDto.getDescription(), taskDto.getCompleted());
     }
 
 

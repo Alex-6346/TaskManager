@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title> Completed tasks </title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+
+</head>
+<body>
+<div layout:include="layouts/sidebar :: sidebar" th:remove="tag">
+    <div layout:fragment="page-content">
+        <form id='findTasks' onsubmit="return false;">
+            <div class="row p-2">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="fromDate"> From date: </label>
+                        <br>
+                        <input type="text" class="form-control" id="fromDate">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label for="toDate"> To date: </label>
+                        <br>
+                        <input type="text" class="form-control" id="toDate">
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary m-2" id="button"> Find </button>
+        </form>
+
+        <div th:include="fragments/category-fragment :: add-category-menu"> </div>
+        <div th:include="fragments/task-fragment :: add-task-menu"> </div>
+
+        <script type="text/javascript" th:src="@{/js/add_date_order_tasks.js}"></script>    <!--</html>-->
+        <h2> Completed tasks: </h2>
+        <div class="container" id="tasksContainer"> </div>
+            <script>
+                jQuery(document).ready(function() {
+                    $( "#fromDate" ).datepicker(
+                        {
+                            dateFormat: 'dd-mm-yy',
+                        }
+                    ).datepicker("setDate", "now");
+
+                    $( "#toDate" ).datepicker(
+                        {
+                            dateFormat: 'dd-mm-yy',
+                        }
+                    ).datepicker("setDate", "now");
+
+                    showCompletedTasks()
+                });
+
+                $( function() {
+                });
+
+                $('#findTasks').submit(function (e){
+                    e.preventDefault()
+                    showCompletedTasks()
+                })
+
+                $('#add-category').submit(function(e){
+                    e.preventDefault()
+                    addCategoryRequest(function(){
+                        updateCategories('#category')
+                        $('#add-category')[0].reset()
+                    })
+                })
+
+                $('#add-task').submit(function (e){
+                    e.preventDefault()
+                    addTaskRequest(function (){
+                        showCompletedTasks()
+                    })
+                })
+
+                function showCompletedTasks() {
+                    $('#tasksContainer').empty()
+                    var fromDate = $('#fromDate').val()
+                    var toDate = $('#toDate').val()
+                    $.ajax({
+                        type: 'GET',
+                        url: 'tasks/completed-tasks',
+                        data: {
+                            from_date: fromDate,
+                            to_date: toDate
+                        },
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader('Content-Type', 'application/json')
+                        },
+                        success: function (data) {
+                            addTasksToPage(data, showCompletedTasks)
+                        }
+                    })
+                }
+
+
+                $('#edit-task').submit(function () {
+                    submitEditHandler(showCompletedTasks)
+                })
+
+            </script>
+        </div>
+    </div>
+</body>
+</html>

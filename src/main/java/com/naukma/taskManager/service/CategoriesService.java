@@ -57,14 +57,12 @@ public class CategoriesService {
 
 
     @Transactional
-    public CategoryEntity updateCategory(CategoryDto categoryDto) {
-        UserEntity user = usersRepository.findById(categoryDto.getUser()).orElse(null);
-        CategoryEntity categoryEntity = new CategoryEntity(categoryDto,user);
-        return  categoriesRepository.saveAndFlush(categoryEntity);
+    public void updateCategory(CategoryDto categoryDto) {
+        categoriesRepository.updateCategory(categoryDto.getId(), categoryDto.getName(), categoryDto.getDescription());
     }
 
     @Transactional
     public void deleteCategory(CategoryDto categoryDto) {
-        categoriesRepository.deleteCategoryEntityById(categoryDto.getId());
+        categoriesRepository.deleteCategory(categoryDto.getId());
     }
 }

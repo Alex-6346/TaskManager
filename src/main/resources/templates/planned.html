@@ -16,6 +16,7 @@
         <div th:include="fragments/category-fragment :: add-category-menu"> </div>
         <div th:include="fragments/task-fragment :: add-task-menu"> </div>
         <br>
+        <script type="text/javascript" th:src="@{/js/add_date_order_tasks.js}"></script>    <!--</html>-->
         <br>
         <div class="container" id="tasksContainer"></div>
         <script>
@@ -35,12 +36,13 @@
                 e.preventDefault()
                 addTaskRequest(function (){
                     showTasks()
-                    $('#add-task')[0].reset()
                 })
             })
 
+
             function showTasks(){
                 $('#tasksContainer').empty()
+                $.ajaxSetup({async: false});
                 $.ajax({
                     type: 'GET',
                     url: 'tasks/show-overdue-tasks',
@@ -48,7 +50,7 @@
                         xhr.setRequestHeader('Content-Type', 'application/json')
                     },
                     success: function (data) {
-                        addOverdueTasksToPage(data)
+                        addOverdueTasksToPage(data, showTasks)
                     }
                 })
                 $.ajax({
@@ -60,84 +62,15 @@
                     success: function (data) {
                         console.log("Not overdue")
                         console.log(data)
-                        addTasksToPage(data)
+                        addTasksToPage(data, showTasks)
                     }
                 })
             }
 
-            function stringToDate(str){
-                date = str.split("-");
-                return new Date(date[2], date[1]-1, date[0])
-            }
+            $('#edit-task').submit(function () {
+                submitEditHandler(showTasks)
+            })
 
-            function dateToStr(date){
-                year = date.getFullYear()
-                month = date.getMonth() + 1
-                day = date.getDate()
-                return day + '-' + month + '-' + year
-            }
-
-            function addOverdueTasksToPage(data){
-                if(data.length === 0){
-                    return
-                }
-                $('#tasksContainer').append(`<h3> Overdue:  </h3>`)
-                $('#tasksContainer').append(`<ul id="overdue"> </ul>`)
-                const [dates, dateTaskMap] = getDatesListAndMap(data)
-                dates.forEach(function (dateObj){
-                    addOverdueDateTasks(dateObj, dateTaskMap)
-                })
-            }
-
-
-            function addTasksToPage(data) {
-                const [dates, dateTaskMap] = getDatesListAndMap(data)
-                dates.forEach(function (dateObj){
-                    addDateWithTasks(dateObj, dateTaskMap)
-                })
-            }
-
-            function addOverdueDateTasks(dateObj, dateTaskMap){
-                date = dateToStr(dateObj)
-                dateTaskMap.get(date).forEach(function (task) {
-                    var badge = '          <span  style="font-size:14px;" class="badge bg-danger">' + date + '</span>'
-                    // '<div class="col-auto">' +
-                    // '             <span  style="font-size:14xpx;" class="badge bg-danger p-1">' + date + '</span>' +
-                    // '        </div>'
-
-                    addTaskToView(task, 'overdue',showTasks, badge)
-                })
-            }
-
-            function addDateWithTasks(dateObj, dateTaskMap){
-                date = dateToStr(dateObj)
-                $('#tasksContainer').append(`<h3> ${date}    </h3>`)
-                $('#tasksContainer').append(`<ul id="${date}"> </ul>`)
-                console.log(date)
-                dateTaskMap.get(date).forEach(function (task) {
-                    console.log(task)
-                    addTaskToView(task, date, showTasks)
-                })
-            }
-
-            function getDatesListAndMap(data){
-                dateTaskMap = new Map()
-                dates = []
-                data.forEach(function (task) {
-                        var date = dateToStr(stringToDate(task.date))
-                        if (dateTaskMap.get(date) === undefined) {
-                            dates.push(stringToDate(date))
-                            dateTaskMap.set(date, [task])
-                        } else {
-                            let dateTasks = dateTaskMap.get(date)
-                            dateTasks.push(task)
-                            dateTaskMap.set(date, dateTasks)
-                        }
-                    }
-                )
-                dates.sort((date1, date2) => date1 - date2);
-                return [dates, dateTaskMap]
-            }
         </script>
     </div>
 </div>

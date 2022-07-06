@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Categories</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+</head>
+<body>
+
+<div layout:include="layouts/sidebar :: sidebar" th:remove="tag">
+    <div layout:fragment="page-content">
+        <div th:include="fragments/category-fragment :: add-category-menu"> </div>
+        <h2> Categories: </h2>
+        <ul id="categories">
+        </ul>
+
+        <script>
+            jQuery(document).ready(function() {
+                console.log('ready')
+                showCategories()
+            });
+
+            $('#add-category').submit(function(e){
+                e.preventDefault()
+                addCategoryRequest(function(){
+                    showCategories()
+                    $('#add-category')[0].reset()
+                })
+            })
+
+            function showCategories(){
+                $('#categories').empty()
+                $.ajax({
+                    type: 'GET',
+                    url: '/categories/show-categories',
+                    success: function (data) {
+                        console.log(data)
+                        addCategoriesView(data)
+                    }
+                })
+            }
+
+            function addCategoriesView(categories){
+                categories.forEach(function (category){
+                    addCategoryToView(category)
+                })
+            }
+
+            function addCategoryToView(category){
+                $('#categories').append(createCategoryView(category))
+                $('#rm' + category.id).click(function (){
+                    handleDeleteCategory(category)
+                })
+
+
+            }
+
+            function handleDeleteCategory(category) {
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/categories/delete',
+                    datatype: 'json',
+                    data: JSON.stringify({
+                            id: category.id,
+                            name: category.name,
+                            description: category.description,
+                        }
+                    ), beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Content-Type', 'application/json')
+                    },
+                    success: function (){
+                        showCategories()
+                    }
+                })
+            }
+
+            function createCategoryView(category){
+                return ' <li id=\"category' + category.id +'\" class="list-group-item d-flex align-items-center border-0 mb-2 rounded"\n' +
+                    '            style="background-color: #f4f6f7;">\n' +
+                    '                <div class="col-auto">\n' +
+                    '                    <label>' + category.name + '</label >\n' +
+                    '                </div>\n' +
+                    '                <div class="ms-auto col-auto">\n' +
+                    '<a class="btn btn-primary btn-lg btn-sm"  href="categories/' + category.id + '" role="button"> View </a>' +
+                    '                </div>\n' +
+                    '<div class="col-auto p-2">\n' +
+                    '                    <button type="button" class="btn btn-outline-danger btn-sm" \n' +
+                    '                            id="rm' + category.id + '" value="' + category.id + '"> Delete </button>\n' +
+                    '                </div>\n' +
+                    '        </li>'
+            }
+
+
+        </script>
+    </div>
+</div>
+</body>
+</html>
