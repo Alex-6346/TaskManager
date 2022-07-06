@@ -1,5 +1,6 @@
 package com.naukma.taskManager.service;
 
+import com.naukma.taskManager.entity.UserDto;
 import com.naukma.taskManager.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,11 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
+
         final UserEntity user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("No user with email: " + email));
+
+        System.out.println(new UserDto(user));
 
         return User.builder()
                 .username(email)

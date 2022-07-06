@@ -31,8 +31,8 @@ public class UsersService {
 
     public UserEntity registerUser(UserDto user) {
         UserEntity newUser = new UserEntity(user);
-        //newUser.setPassword(BCrypt.hashpw(user.getPassword(), SaltStorage.SALT));
-
+//        newUser.setPassword(BCrypt.hashpw(user.getPassword(), SaltStorage.SALT));
+        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
         UserEntity sameUser = usersRepository.findByEmail(user.getEmail()).orElse(null);
         if (sameUser == null) {
             usersRepository.saveAndFlush(newUser);

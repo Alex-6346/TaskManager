@@ -12,20 +12,23 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/register")
 public class LoginController {
 
     @Autowired
     private UsersService usersService;
 
-    @GetMapping
+    @GetMapping("/login")
+    public String loginPage() {return "login";};
+
+    @GetMapping("/register")
     public String registerPage(Model model){
-        return "book-register";
+        return "register";
     }
 
-    @PostMapping
+    @PostMapping("/register")
     @ResponseBody
     public UserEntity createUser(@Valid @RequestBody UserDto user){
+        System.out.println(user);
         return  usersService.registerUser(user);
     }
 
