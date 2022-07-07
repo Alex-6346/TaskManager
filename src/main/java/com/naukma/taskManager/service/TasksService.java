@@ -36,7 +36,7 @@ public class TasksService {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = ((UserDetails) principal).getUsername();
         UserEntity user = usersRepository.findByEmail(email).orElse(null);
-        CategoryEntity category = categoriesRepository.findByName(taskDto.getCategory()).orElse(null);
+        CategoryEntity category = categoriesRepository.findByNameAndUserId(taskDto.getCategory(), user.getId()).orElse(null);
 
         TaskEntity taskEntity = new TaskEntity(taskDto,user,category);
         return tasksRepository.saveAndFlush(taskEntity);

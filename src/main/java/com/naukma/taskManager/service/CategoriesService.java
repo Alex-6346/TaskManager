@@ -38,6 +38,11 @@ public class CategoriesService {
 
 
     @Transactional
+    public CategoryEntity getCategoryByName(String name, Long userID){
+        return categoriesRepository.findByNameAndUserId(name, userID).get();
+    }
+
+    @Transactional
     public List<CategoryEntity> findAllCategories() {
         return categoriesRepository.findAll();
     }
@@ -46,10 +51,6 @@ public class CategoriesService {
     public List<CategoryEntity> findAllCategoriesByUser(UserEntity user) {
 //        return categoriesRepository.findAllByUserId(user.getId());
         return categoriesRepository.findCategoriesByUserID(user.getId());
-    }
-
-    private CategoryDto convertToDto(CategoryEntity category) {
-        return new CategoryDto(category);
     }
 
     @Transactional

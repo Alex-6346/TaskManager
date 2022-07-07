@@ -35,7 +35,7 @@ public class CategoriesController {
     private CategoriesService categoriesService;
 
     @GetMapping("")
-    public String caategoriesPage(Model model) {
+    public String categoriesPage(Model model) {
         return "categories";
     }
 
@@ -114,6 +114,15 @@ public class CategoriesController {
         return ResponseEntity.status(HttpStatus.OK).body(categoryDto);
     }
 
+    @ResponseBody
+    @GetMapping("/getcategory")
+    private ResponseEntity<CategoryDto> getCategoryByName(@RequestParam("name") String name){
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = ((UserDetails) principal).getUsername();
+        UserEntity user = usersService.getUserByEmail(email);
+        return ResponseEntity.status(HttpStatus.OK).body(new CategoryDto(categoriesService.getCategoryByName(name, user.getId())));
+    }
+
     @PutMapping("/update")
     @ResponseBody
     public ResponseEntity<?> updateCategory(Model model, @RequestBody CategoryDto categoryDto){
@@ -168,7 +177,7 @@ public class CategoriesController {
         String email = ((UserDetails) principal).getUsername();
         UserEntity user = usersService.getUserByEmail(email);
         categoryDto.setUser(user.getId());
-        System.out.println("delete category: " + categoryDto);
+
         categoriesService.deleteCategory(categoryDto);
         return ResponseEntity.status(HttpStatus.OK).body(categoryDto);
     }

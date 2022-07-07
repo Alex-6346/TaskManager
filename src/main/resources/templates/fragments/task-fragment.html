@@ -112,6 +112,10 @@
 
         function updateCategories(selectID){
             $(selectID).empty()
+            appendUserCategories(selectID)
+        }
+
+        function appendUserCategories(selectID){
             $.ajax({
                 type: 'GET',
                 url: '/categories/names',
@@ -121,6 +125,12 @@
                     })
                 }
             })
+        }
+
+        function updateFilterCategories(selectID){
+            $(selectID).empty()
+            $(selectID).append(new Option(""))
+            appendUserCategories(selectID)
         }
 
         function addTaskRequest(successFun) {

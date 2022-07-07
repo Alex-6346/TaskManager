@@ -41,7 +41,7 @@ public class LoginController {
         categoryDto.setDescription("This is a default category");
         categoryDto.setUser(userEntity.getId());
         categoriesService.createCategory(categoryDto);
-        System.out.println("Category dto" + categoryDto);
+
         return user;
     }
 }

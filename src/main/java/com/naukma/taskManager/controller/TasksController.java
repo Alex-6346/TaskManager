@@ -37,8 +37,6 @@ public class TasksController {
     public ResponseEntity<TaskDto> addTask(@Valid @RequestBody TaskDto taskDto) {
         TaskEntity taskEntity = tasksService.createTask(taskDto);
         taskDto.setId(taskEntity.getId());
-        System.out.println("Add task: ");
-        System.out.println(taskDto);
         return  ResponseEntity.status(HttpStatus.OK).body(taskDto);
     }
 
@@ -58,8 +56,6 @@ public class TasksController {
         String email = ((UserDetails) principal).getUsername();
         UserEntity user = usersService.getUserByEmail(email);
         taskDto.setUser(user.getId());
-        System.out.println("Update tasks: ");
-        System.out.println(taskDto);
         tasksService.updateTask(taskDto);
 
         return  ResponseEntity.status(HttpStatus.OK).body(taskDto);
@@ -68,7 +64,6 @@ public class TasksController {
     @DeleteMapping("/delete")
     @ResponseBody
     public ResponseEntity<TaskDto> deleteTask(@RequestBody TaskDto taskDto){
-        System.out.println("Delete");
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = ((UserDetails) principal).getUsername();
         UserEntity user = usersService.getUserByEmail(email);
@@ -162,8 +157,6 @@ public class TasksController {
         TaskEntity taskEntity = tasksService.getTaskById(id);
         TaskDto taskDto = new TaskDto(taskEntity);
 
-        System.out.println("Get task by id: " + id);
-        System.out.println("Get tasks: " + taskDto);
         return new TaskDto(taskEntity);
     }
 
