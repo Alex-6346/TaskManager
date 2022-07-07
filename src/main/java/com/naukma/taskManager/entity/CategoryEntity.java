@@ -44,6 +44,7 @@ public class CategoryEntity {
         if(!Objects.isNull(categoryDto.getId())){
             this.id=categoryDto.getId();
         }
+        System.out.println("User ID, create category entity: " + userId);
         this.name=categoryDto.getName();
         this.description=categoryDto.getDescription();
         this.userId=userId;

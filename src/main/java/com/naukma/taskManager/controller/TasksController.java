@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.websocket.server.PathParam;
 import java.time.LocalDate;
 import java.util.List;
@@ -33,7 +34,7 @@ public class TasksController {
 
     @PostMapping("/add")
     @ResponseBody
-    public ResponseEntity<TaskDto> addTask(@RequestBody TaskDto taskDto) {
+    public ResponseEntity<TaskDto> addTask(@Valid @RequestBody TaskDto taskDto) {
         TaskEntity taskEntity = tasksService.createTask(taskDto);
         taskDto.setId(taskEntity.getId());
         System.out.println("Add task: ");
@@ -52,7 +53,7 @@ public class TasksController {
 
     @PutMapping("/update")
     @ResponseBody
-    public ResponseEntity<TaskDto> updateTask(@RequestBody TaskDto taskDto){
+    public ResponseEntity<TaskDto> updateTask(@Valid @RequestBody TaskDto taskDto){
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = ((UserDetails) principal).getUsername();
         UserEntity user = usersService.getUserByEmail(email);
@@ -109,8 +110,6 @@ public class TasksController {
     public List<TaskDto> completedTasks(@RequestParam("from_date") @DateTimeFormat(pattern="dd-MM-yyyy") LocalDate fromDate,
                                         @RequestParam("to_date")  @DateTimeFormat(pattern="dd-MM-yyyy")
             LocalDate toDate) {
-        System.out.println("From date: " + fromDate);
-        System.out.println("To date: " + toDate);
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = ((UserDetails) principal).getUsername();
         UserEntity user = usersService.getUserByEmail(email);

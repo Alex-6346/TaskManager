@@ -17,6 +17,11 @@ public interface CategoriesRepository extends JpaRepository<CategoryEntity, Inte
 
     List<CategoryEntity> findAll();
     List<CategoryEntity> findAllByUserId(long userId);
+
+
+    @Query("SELECT c from CategoryEntity c where c.userId=:userID")
+    List<CategoryEntity> findCategoriesByUserID(@Param("userID") long userID);
+
     CategoryEntity saveAndFlush(CategoryEntity categoryEntity);
 
 

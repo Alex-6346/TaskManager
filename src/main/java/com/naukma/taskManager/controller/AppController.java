@@ -26,15 +26,14 @@ public class AppController {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = ((UserDetails) principal).getUsername();
         UserEntity user = usersService.getUserByEmail(email);
-        System.out.println(user.getCategories());
-        /*if(user.getCategories().isEmpty()) {
-            System.out.println("empty");
-            CategoryDto categoryDto = new CategoryDto();
-            categoryDto.setName("Bills");
-            categoryDto.setDescription("test desr");
-            categoryDto.setUser(user.getId());
-            categoriesService.createCategory(categoryDto);
-        }*/
+
+//        if(categoriesService.findAllCategoriesByUser(user).isEmpty()) {
+//            CategoryDto categoryDto = new CategoryDto();
+//            categoryDto.setName("Default");
+//            categoryDto.setDescription("test description");
+//            categoryDto.setUser(user.getId());
+//            categoriesService.createCategory(categoryDto);
+//        }
         return "planned";
     }
 

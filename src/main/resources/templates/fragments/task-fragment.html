@@ -6,16 +6,18 @@
         <button class="btn btn-primary" type="button" id="toggle-tasks">
             Add task </button>
     </div>
+    <div class="container" id="error-add-task">
+    </div>
     <form id='add-task' onsubmit="return false;">
         <div class="form-group p-1">
             <label for="taskName">Task: </label>
-            <input type="text" maxlength="80" class="form-control" id="taskName" >
+            <input type="text" maxlength="80" class="form-control" id="taskName" required>
         </div>
         <div class="row p-2">
             <div class="col">
                 <div class="form-group">
                     <label for="category"> Select task category: </label>
-                    <select class="form-control" id="category">
+                    <select class="form-control" id="category" required>
                     </select>
                 </div>
             </div>
@@ -23,7 +25,7 @@
                 <div class="form-group">
                     <label for="datepicker"> Date: </label>
                     <br>
-                    <input type="text" class="form-control" id="datepicker">
+                    <input type="text" class="form-control" id="datepicker" required>
                 </div>
             </div>
         </div>
@@ -33,16 +35,15 @@
         </div>
         <button type="submit" class="btn btn-primary" id="button"> Submit </button>
     </form>
-
-
     <div class="modal fade" id="editTask" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered  modal-dialog-scrollable">
+        <div class="modal-dialog modal-xl  modal-dialog-centered  modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-body">
                     <form id='edit-task' onsubmit="return false;">
+                        <div class="container" id="error-edit-task"> </div>
                         <div class="form-group p-1">
                             <label for="editTaskName">Task: </label>
-                            <input type="text" maxlength="80" class="form-control" id="editTaskName" >
+                            <input type="text" maxlength="80" class="form-control" id="editTaskName" required>
                         </div>
 
                         <div class="row p-2">
@@ -57,28 +58,27 @@
                                 <div class="form-group">
                                     <label for="editDatepicker"> Date: </label>
                                     <br>
-                                    <input type="text" class="form-control" id="editDatepicker">
+                                    <input type="text" class="form-control" id="editDatepicker" required>
                                 </div>
                             </div>
                         </div>
                         <div class="md-form blue-textarea active-blue-textarea p-2">
                             <label for="editDescription"> Description: </label>
-                            <textarea class="form-control" id="editDescription" rows="3"></textarea>
+                            <textarea class="form-control" id="editDescription" rows="5"></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary" id="editButton" data-bs-dismiss="modal"> Submit </button>
+                        <button type="submit" class="btn btn-primary" id="editButton"> Save </button>
                     </form>
                 </div>
                 <div class="modal-footer">
-    <!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>-->
+                        <button type="button" class="md-4 btn btn-secondary" id="closeEditTask" data-bs-dismiss="modal">Close</button>
 <!--                    <button id='saveButton' type="button" class="btn btn-primary"> Save </button>-->
                 </div>
             </div>
         </div>
     </div>
-
+    <script type="text/javascript" th:src="@{/js/error_handler.js}"></script>    <!--</html>-->
 
     <script>
-
         jQuery(document).ready(function() {
             $('#add-task').toggle()
             updateCategories('#category')
@@ -138,7 +138,13 @@
                 ), beforeSend: function (xhr) {
                     xhr.setRequestHeader('Content-Type', 'application/json')
                 },
-                success: successFun
+                success:function(){
+                    successFun()
+                    $('#error-add-task').empty()
+                },
+                error: function (xhr, status, error){
+                    showErrors(xhr, '#error-add-task')
+                }
             })
         }
 
@@ -146,9 +152,8 @@
             $(`#${listID}`).append(createTaskView(task, dateBadge))
             $('#' + task.id).click(function(){
                 $('#edit-task').val(task.id)
+                $('#error-add-task').empty()
                 updateViewModalFields(task)
-                console.log("edit task clicked")
-                console.log(task)
             })
             $(`#rm${task.id}`).click(function (){
                 handleDeleteTask(task, showTasksFun)})
@@ -202,64 +207,37 @@
             getTasksByID(formValue, showTasksFun)
         }
 
-        function handleUpdateTask(task, showTasksFun) {
-            updateViewModalFields(task)
-        }
-
         function getTasksByID(id, showTasksFun){
             $.ajax({
                 type: 'GET',
                 url: '/tasks/get/' + id,
                 success: function (task) {
-                    let editName = $('#editTaskName').val()
-                    let editDescription = $('#editDescription').val()
-                    let editDate = $('#editDatepicker').val()
-                    let editCategory = $('#editCategory').val()
-
-                    task.name = editName
-                    task.description = editDescription
-                    task.category = editCategory
-                    task.date = editDate
+                    task.name = $('#editTaskName').val()
+                    task.description = $('#editDescription').val()
+                    task.category =$('#editCategory').val()
+                    task.date =  $('#editDatepicker').val()
                     updateTaskRequest(task, showTasksFun)
-                    $('#edit-task')[0].reset()
                 }
             })
         }
 
         function updateViewModalFields(task){
             updateCategories('#editCategory')
-            let editName = task.name
-            let editDescription = task.description
-            let editDate = task.date
-            let editCategory = task.category
-
-            $('#editTaskName').val(editName)
-            $('#editCategory').val(editCategory)
-            $('#editDatepicker').val(editDate)
-            $('#editDescription').val(editDescription)
+            $('#editTaskName').val(task.name)
+            $('#editCategory').val(task.category)
+            $('#editDatepicker').val(task.date)
+            $('#editDescription').val(task.description)
         }
 
         function updateTaskRequest(task, successFun){
-            let editID = task.id
-            let editName = task.name
-            let editDescription = task.description
-            let editDate = task.date
-            let editCategory = task.category
-            let editCompleted = task.completed
-
-
             let updatedTask = JSON.stringify({
-                id: editID,
-                name: editName,
-                description: editDescription,
-                completed: editCompleted,
-                category: editCategory,
-                date: editDate
+                id: task.id,
+                name: task.name,
+                description: task.description,
+                completed: task.completed,
+                category: task.category,
+                date: task.date
             })
-
-
-            console.log("updatedTask: " + editID)
-
             $.ajax({
                 type: 'PUT',
                 url: '/tasks/update/',
@@ -268,13 +246,18 @@
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('Content-Type', 'application/json')
                 },
-                success: successFun,
-                error: function(data){
-                    console.log("Update error")
-                    console.log(data)
+                success:function (){
+                    successFun()
+                    $('#error-edit-task').empty()
+                    $('#closeEditTask').click()
+                    $('#edit-task')[0].reset()
+                },
+                error:  function (xhr, status, error){
+                    showErrors(xhr, '#error-edit-task')
                 }
             })
         }
+
 
         function handleDeleteTask(task, successFun) {
             $.ajax({

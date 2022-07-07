@@ -5,10 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.0.2/tailwind.min.css">
     <title> Register</title>
 </head>
 <body class="h-screen">
+<div class="align-items-center">
+    <div class="container" id="errors-container"> </div>
+</div>
 <div class="container mx-auto h-full flex justify-center items-center text-blue-700 px-4">
     <div class="md:w-1/3 shadow-xl rounded-2xl border bg-blue-100 w-full">
         <h1 class="text-center font-medium text-2xl text-white rounded-t-2xl bg-blue-500 py-4">Register</h1>
@@ -45,6 +49,7 @@
         </div>
     </div>
 </div>
+<!--<script type="text/javascript" th:src="@{../js/error_handler.js}"></script>    &lt;!&ndash;</html>&ndash;&gt;-->
 <script>
     $('#register').submit(function(e){
         e.preventDefault();
@@ -63,11 +68,17 @@
             success: function (response) {
                 console.log(response)
                 window.location = '/login'
-            },
+            },error: function (xhr, status, error){
+                errors = JSON.parse(xhr.responseText)
+                errors.forEach(function (err){
+                    var errorHTML = '<div class="alert alert-danger" role="alert">' + err + '</div>'
+                    console.log(errorHTML)
+                    $('#errors-container').html(errorHTML)
+                })
+            }
         })
 
     })
-
 
 </script>
 </body>

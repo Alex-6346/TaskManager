@@ -51,16 +51,7 @@
       </dependency>
 ````
 * За допомогою Spring Initializr зазначені залежності було додано автоматично, але також є можливість змінити налаштування  проєкту вручну в pom-файлі
- 
 
-### Frontend client: 
-* Використовується React версії 18.2
-* Для запуску потрібно встановити npm і Node.js 14+ версії ([інструкції встановлення](https://nodejs.dev/learn/how-to-install-nodejs))
-* Після цього для запуску фронтенд-клієнта, в терміналі перебуваючи в корневій папці проекта потрібно ввести: 
-  ```
-  cd frontend-client
-  npm start
-  ```
 ### VCS
 * Git можна встановити за посиланням  https://git-scm.com/download/win
 * В середовищі розробки (в нашому випадку Intellij Idea) File->Settings->Version Control System -> Git ![img_2.png](img_2.png)

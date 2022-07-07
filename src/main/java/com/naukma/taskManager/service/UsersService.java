@@ -35,7 +35,8 @@ public class UsersService {
         newUser.setPassword(passwordEncoder.encode(user.getPassword()));
         UserEntity sameUser = usersRepository.findByEmail(user.getEmail()).orElse(null);
         if (sameUser == null) {
-            usersRepository.saveAndFlush(newUser);
+            UserEntity saved =usersRepository.saveAndFlush(newUser);
+            newUser.setId(saved.getId());
             return newUser;
         } else {
             return null;

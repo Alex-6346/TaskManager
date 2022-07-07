@@ -13,6 +13,7 @@ import com.naukma.taskManager.repository.CategoriesRepository;
 import com.naukma.taskManager.repository.UsersRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,11 +27,7 @@ public class CategoriesService {
 
     @Transactional
     public CategoryEntity createCategory(CategoryDto categoryDto) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
-        UserEntity user = usersRepository.findByEmail(email).orElse(null);
-
-        CategoryEntity categoryEntity = new CategoryEntity(categoryDto,user.getId());
+        CategoryEntity categoryEntity = new CategoryEntity(categoryDto,categoryDto.getUser());
         return categoriesRepository.saveAndFlush(categoryEntity);
     }
 
@@ -44,9 +41,15 @@ public class CategoriesService {
     public List<CategoryEntity> findAllCategories() {
         return categoriesRepository.findAll();
     }
+
     @Transactional
     public List<CategoryEntity> findAllCategoriesByUser(UserEntity user) {
-        return categoriesRepository.findAllByUserId(user.getId());
+//        return categoriesRepository.findAllByUserId(user.getId());
+        return categoriesRepository.findCategoriesByUserID(user.getId());
+    }
+
+    private CategoryDto convertToDto(CategoryEntity category) {
+        return new CategoryDto(category);
     }
 
     @Transactional

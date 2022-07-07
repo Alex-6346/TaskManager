@@ -2,6 +2,7 @@ package com.naukma.taskManager.entity;
 
 import lombok.*;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
@@ -14,7 +15,8 @@ public class UserDto {
 
     private long id;
 
-    @NotBlank(message = "Email cannot be blank")
+    @NotBlank(message="Email cannot be blank")
+    @Email(message = "Wrong email format")
     private String email;
 
     @NotBlank(message = "Full name cannot be blank")
