@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "categories")
+@Table(name = "categories", uniqueConstraints = { @UniqueConstraint(columnNames = { "category_name", "user_id" }) })
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -19,7 +19,7 @@ public class CategoryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "category_name", unique=true)
+    @Column(name = "category_name")
     private String name;
 
     @Column(name = "description")
@@ -31,19 +31,22 @@ public class CategoryEntity {
             inverseJoinColumns = @JoinColumn(name = "task_id"))
     private List<TaskEntity> tasks;
 
-    @ManyToOne
+    @Column(name="user_id")
+    private long userId;
+
+   /* @ManyToOne
     @JoinTable(name = "categories_to_user",
             joinColumns = @JoinColumn(name = "category_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private UserEntity user;
+    private UserEntity user;*/
 
-    public CategoryEntity(CategoryDto categoryDto, UserEntity user){
+    public CategoryEntity(CategoryDto categoryDto, long userId){
         if(!Objects.isNull(categoryDto.getId())){
             this.id=categoryDto.getId();
         }
         this.name=categoryDto.getName();
         this.description=categoryDto.getDescription();
-        this.user=user;
+        this.userId=userId;
     }
 
 }

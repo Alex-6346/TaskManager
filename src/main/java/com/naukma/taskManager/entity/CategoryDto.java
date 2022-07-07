@@ -25,7 +25,7 @@ public class CategoryDto {
         this.id= categoryEntity.getId();
         this.name=categoryEntity.getName();
         this.description=categoryEntity.getDescription();
-        this.user= categoryEntity.getUser().getId();
+        this.user= categoryEntity.getUserId();
     }
 
 }

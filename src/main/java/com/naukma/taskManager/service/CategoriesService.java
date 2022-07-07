@@ -30,7 +30,7 @@ public class CategoriesService {
         String email = ((UserDetails) principal).getUsername();
         UserEntity user = usersRepository.findByEmail(email).orElse(null);
 
-        CategoryEntity categoryEntity = new CategoryEntity(categoryDto,user);
+        CategoryEntity categoryEntity = new CategoryEntity(categoryDto,user.getId());
         return categoriesRepository.saveAndFlush(categoryEntity);
     }
 
@@ -46,12 +46,12 @@ public class CategoriesService {
     }
     @Transactional
     public List<CategoryEntity> findAllCategoriesByUser(UserEntity user) {
-        return categoriesRepository.findAllByUser(user);
+        return categoriesRepository.findAllByUserId(user.getId());
     }
 
     @Transactional
     public List<String> namesByUser(UserEntity user){
-        return categoriesRepository.namesByUser(user);
+        return categoriesRepository.namesByUser(user.getId());
     };
 
 

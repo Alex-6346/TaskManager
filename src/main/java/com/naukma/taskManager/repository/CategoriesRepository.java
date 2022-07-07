@@ -16,13 +16,13 @@ import org.springframework.data.repository.query.Param;
 public interface CategoriesRepository extends JpaRepository<CategoryEntity, Integer> {
 
     List<CategoryEntity> findAll();
-    List<CategoryEntity> findAllByUser(UserEntity user);
+    List<CategoryEntity> findAllByUserId(long userId);
     CategoryEntity saveAndFlush(CategoryEntity categoryEntity);
 
 
     @Query("SELECT c.name FROM CategoryEntity c " +
-            "where c.user=:user")
-    List<String> namesByUser(UserEntity user);
+            "where c.userId=:userId")
+    List<String> namesByUser(long userId);
 
     @Modifying
     @Query("delete from CategoryEntity c where c.id=:id")
