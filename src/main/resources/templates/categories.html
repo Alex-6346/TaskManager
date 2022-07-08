@@ -14,6 +14,21 @@
 <div layout:include="layouts/sidebar :: sidebar" th:remove="tag">
     <div layout:fragment="page-content">
         <div th:include="fragments/category-fragment :: add-category-menu"> </div>
+
+        <div class="modal fade" id="confirm-delete" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl  modal-dialog-centered  modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Are you sure you want to delete this task?</h5>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="confirmDeleteBtn" type="button" class="btn btn-primary"> Yes </button>
+                        <button type="button" class="md-4 btn btn-secondary" id="cancelDeleteBtn" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <h2> Categories: </h2>
         <ul id="categories">
         </ul>
@@ -53,27 +68,24 @@
             function addCategoryToView(category){
                 $('#categories').append(createCategoryView(category))
                 $('#rm' + category.id).click(function (){
-                    handleDeleteCategory(category)
+                    $('#confirmDeleteBtn').val(task.id)
                 })
 
 
             }
 
-            function handleDeleteCategory(category) {
+            function handleDeleteCategory(categoryID) {
                 $.ajax({
                     type: 'DELETE',
                     url: '/categories/delete',
                     datatype: 'json',
-                    data: JSON.stringify({
-                            id: category.id,
-                            name: category.name,
-                            description: category.description,
-                        }
-                    ), beforeSend: function (xhr) {
+                    data: categoryID,
+                    beforeSend: function (xhr) {
                         xhr.setRequestHeader('Content-Type', 'application/json')
                     },
                     success: function (){
                         showCategories()
+                        $('#cancelDeleteBtn').click()
                     }
                 })
             }
@@ -94,6 +106,9 @@
                     '        </li>'
             }
 
+            $('#confirmDeleteBtn').click(function (){
+                handleDeleteCategory($('#confirmDeleteBtn').val(), showCategories)
+            })
 
         </script>
     </div>

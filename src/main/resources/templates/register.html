@@ -71,7 +71,7 @@
             },error: function (xhr, status, error){
                 errors = JSON.parse(xhr.responseText)
                 errors.forEach(function (err){
-                    var errorHTML = '<div class="alert alert-danger" role="alert">' + err + '</div>'
+                    var errorHTML = '<div class="text-center alert alert-danger" role="alert">' + err + '</div>'
                     console.log(errorHTML)
                     $('#errors-container').html(errorHTML)
                 })

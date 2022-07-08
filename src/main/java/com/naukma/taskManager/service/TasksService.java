@@ -105,8 +105,8 @@ public class TasksService {
 
 
     @Transactional
-    public void deleteTask(TaskDto taskDto) {
-        tasksRepository.deleteTask(taskDto.getId());
+    public void deleteTask(long taskID) {
+        tasksRepository.deleteTask(taskID);
 //        tasksRepository.deleteTaskEntityById(taskDto.getId());
     }
 }

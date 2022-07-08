@@ -150,6 +150,10 @@
                 submitEditHandler(showTasks)
             })
 
+            $('#confirmDeleteBtn').click(function (){
+                handleDeleteTask($('#confirmDeleteBtn').val(), showTasks)
+            })
+
         </script>
     </div>
 </div>

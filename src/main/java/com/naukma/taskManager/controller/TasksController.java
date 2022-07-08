@@ -63,13 +63,9 @@ public class TasksController {
 
     @DeleteMapping("/delete")
     @ResponseBody
-    public ResponseEntity<TaskDto> deleteTask(@RequestBody TaskDto taskDto){
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
-        UserEntity user = usersService.getUserByEmail(email);
-        taskDto.setUser(user.getId());
-        tasksService.deleteTask(taskDto);
-        return  ResponseEntity.status(HttpStatus.OK).body(taskDto);
+    public ResponseEntity<Long> deleteTask(@RequestBody Long taskID){
+        tasksService.deleteTask(taskID);
+        return  ResponseEntity.status(HttpStatus.OK).body(taskID);
     }
 
     @GetMapping("/view")

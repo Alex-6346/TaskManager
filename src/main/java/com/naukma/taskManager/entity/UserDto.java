@@ -16,7 +16,7 @@ public class UserDto {
     private long id;
 
     @NotBlank(message="Email cannot be blank")
-    @Email(message = "Wrong email format")
+    @Email(message = "Wrong email format. Example of a valid email: firstuser@domain.com")
     private String email;
 
     @NotBlank(message = "Full name cannot be blank")
