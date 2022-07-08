@@ -11,10 +11,8 @@ public interface UsersRepository extends JpaRepository<UserEntity, Integer> {
 
     List<UserEntity> findAll();
     UserEntity saveAndFlush(UserEntity contactDto);
-
     Optional<UserEntity> findById(long id);
     Optional<UserEntity>findByEmail(String email);
-
     void deleteById(long id);
 
 }

@@ -16,10 +16,8 @@ import org.springframework.security.core.parameters.P;
 
 
 public interface TasksRepository extends JpaRepository<TaskEntity, Integer> {
-
     List<TaskEntity> findAll();
     TaskEntity saveAndFlush(TaskEntity taskEntity);
-
     Optional<TaskEntity>findById(long id);
     List<TaskEntity> findByUser(UserEntity userEntity);
 
