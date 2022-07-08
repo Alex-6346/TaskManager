@@ -33,6 +33,8 @@
                     e.preventDefault()
                     addTaskRequest(function (){
                         showMyDayTasks()
+                        $('#add-task')[0].reset()
+                        updateCategories('#category')
                     })
                 })
 

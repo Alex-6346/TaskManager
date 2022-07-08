@@ -71,7 +71,7 @@ public class CategoriesController {
 //                    .body(errors);
 //        }
 
-        ResponseEntity<?> error = validateCategory(categoryDto, user);
+        ResponseEntity<?> error = validateCategory(categoryDto, user, false);
         if(error != null){
             return error;
         }
@@ -80,7 +80,7 @@ public class CategoriesController {
         return ResponseEntity.status(HttpStatus.OK).body(categoryDto);
     }
 
-    private ResponseEntity<?> validateCategory(CategoryDto categoryDto, UserEntity user){
+    private ResponseEntity<?> validateCategory(CategoryDto categoryDto, UserEntity user, boolean isUpdate){
         final Set<ConstraintViolation<CategoryDto>> validationResult = validator.validate(categoryDto);
         final List<String> errors = validationResult.stream()
                 .map(errorField -> "Field [" + errorField.getPropertyPath() + "] is invalid. Validation error: " + errorField.getMessage())
@@ -91,7 +91,12 @@ public class CategoriesController {
                     .body(errors);
         }
 
+
         if(categoriesService.namesByUser(user).contains(categoryDto.getName())) {
+            if(isUpdate && categoriesService.getCategoryByName(categoryDto.getName(), user.getId()) != null){
+                return null;
+            }
+
             errors.add("User already have category with this name");
             return ResponseEntity.badRequest()
                     .body(errors);
@@ -130,7 +135,7 @@ public class CategoriesController {
         String email = ((UserDetails) principal).getUsername();
         UserEntity user = usersService.getUserByEmail(email);
         categoryDto.setUser(user.getId());
-        ResponseEntity<?> error = validateCategory(categoryDto, user);
+        ResponseEntity<?> error = validateCategory(categoryDto, user, true);
 
         if(error != null){
             return error;
@@ -172,14 +177,9 @@ public class CategoriesController {
 
     @DeleteMapping("/delete")
     @ResponseBody
-    public ResponseEntity<CategoryDto> deleteCategory(@RequestBody CategoryDto categoryDto){
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String email = ((UserDetails) principal).getUsername();
-        UserEntity user = usersService.getUserByEmail(email);
-        categoryDto.setUser(user.getId());
-
-        categoriesService.deleteCategory(categoryDto);
-        return ResponseEntity.status(HttpStatus.OK).body(categoryDto);
+    public ResponseEntity<Long> deleteCategory(@RequestBody Long categoryID){
+        categoriesService.deleteCategory(categoryID);
+        return ResponseEntity.status(HttpStatus.OK).body(categoryID);
     }
 
     private CategoryDto convertToDto(CategoryEntity category) {

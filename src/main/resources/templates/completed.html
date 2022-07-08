@@ -76,6 +76,8 @@
                     e.preventDefault()
                     addTaskRequest(function (){
                         showCompletedTasks()
+                        $('#add-task')[0].reset()
+                        updateCategories('#category')
                     })
                 })
 

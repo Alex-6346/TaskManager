@@ -66,7 +66,7 @@ public class CategoriesService {
     }
 
     @Transactional
-    public void deleteCategory(CategoryDto categoryDto) {
-        categoriesRepository.deleteCategory(categoryDto.getId());
+    public void deleteCategory(Long categoryID) {
+        categoriesRepository.deleteCategory(categoryID);
     }
 }
