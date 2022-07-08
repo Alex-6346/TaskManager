@@ -75,7 +75,7 @@ public class TasksRepoTests {
         TaskEntity dto2=new TaskEntity(5, "write", "3k", LocalDate.of(2020, 1, 8),  true, ue, category);
 TaskDto dto=new TaskDto(dto2);
 
-        service.deleteTask(dto);
+        service.deleteTask(5);
         verify(repository, times(1)).deleteTask(dto.getId());
     }
 
@@ -86,13 +86,107 @@ TaskDto dto=new TaskDto(dto2);
 
 
         CategoryEntity category=new CategoryEntity();
-        TaskEntity dto2=new TaskEntity(5, "write", "3k", LocalDate.of(2020, 1, 8),  true, ue, category);
+        TaskEntity dto2=new TaskEntity(5, "write", "3k", LocalDate.of(2020, 1, 8),  false, ue, category);
+        TaskEntity dto=new TaskEntity(2, "read", "500 pages", LocalDate.of(2021, 1, 8),false, ue, category);
+        List<TaskEntity> opt = List.of(dto2, dto);
 
-
-        Optional<TaskEntity> opt = Optional.of(dto2);
-
-        when(repository.findById(5))
+        when(repository.getOverdueTasks(ue, LocalDate.of(2022,7,8)))
                 .thenReturn(opt);
-        assertEquals(5, service.getTaskById(5).getId());
+        assertEquals(opt, service.findUserOverdueTasks(ue));
     }
+
+    @Test
+    public void findNotOverdueTest(){
+        UserDto user=new UserDto(1, "firstuser@gmail.com", "David Seaman","first123" );
+        UserEntity ue=new UserEntity(user);
+
+
+        CategoryEntity category=new CategoryEntity();
+        TaskEntity dto2=new TaskEntity(5, "write", "3k", LocalDate.of(2022, 9, 8),  false, ue, category);
+        TaskEntity dto=new TaskEntity(2, "read", "500 pages", LocalDate.of(2021, 1, 8),false, ue, category);
+        List<TaskEntity> opt = List.of(dto2, dto);
+
+        when(repository.getOverdueTasks(ue, LocalDate.of(2022,7,8)))
+                .thenReturn(opt);
+        assertEquals(opt, service.findUserOverdueTasks(ue));
+    }
+    @Test
+    public void findTodayTest(){
+        UserDto user=new UserDto(1, "firstuser@gmail.com", "David Seaman","first123" );
+        UserEntity ue=new UserEntity(user);
+
+        CategoryEntity category=new CategoryEntity();
+        TaskEntity dto2=new TaskEntity(5, "write", "3k", LocalDate.of(2022, 7, 8),  false, ue, category);
+        TaskEntity dto=new TaskEntity(2, "read", "500 pages", LocalDate.of(2021, 1, 8),false, ue, category);
+        TaskEntity dto3=new TaskEntity(3, "fly", "200 miles", LocalDate.of(2021, 2, 3),true, ue, category);
+        List<TaskEntity> inc = List.of(dto2, dto, dto3);
+
+        when(repository.findTodayTasks(ue,LocalDate.of(2022, 7, 8), false ))
+                .thenReturn(inc);
+        assertEquals(inc, service.findUserTodayIncompleteTasks(ue));
+
+        List<TaskEntity> comp = List.of(dto2, dto, dto3);
+        when(repository.findTodayTasks(ue,LocalDate.of(2022, 7, 8), true ))
+                .thenReturn(comp);
+        assertEquals(comp, service.findUserTodayCompletedTasks(ue));
+    }
+    @Test
+    public void findOverdueByCategoryTest(){
+        UserDto user=new UserDto(1, "firstuser@gmail.com", "David Seaman","first123" );
+        UserEntity ue=new UserEntity(user);
+
+        CategoryDto cat = new CategoryDto(1, "name", "descr", ue.getId());
+        CategoryDto cat2 = new CategoryDto(2, "house", "make", ue.getId());
+        CategoryEntity category=new CategoryEntity(cat, ue.getId());
+        CategoryEntity category2=new CategoryEntity(cat2, ue.getId());
+        TaskEntity dto2=new TaskEntity(5, "write", "3k", LocalDate.of(2022, 9, 8),  false, ue, category);
+        TaskEntity dto=new TaskEntity(2, "read", "500 pages", LocalDate.of(2021, 1, 8),false, ue, category2);
+        TaskEntity dto3=new TaskEntity(3, "fly", "200 miles", LocalDate.of(2021, 2, 3),true, ue, category);
+        List<TaskEntity> inc = List.of(dto2, dto, dto3);
+
+        when(repository.findOverdueTasksByCategory(ue, cat.getId(),LocalDate.of(2022, 7, 8)))
+                .thenReturn(inc);
+        assertEquals(inc, service.findUserOverdueTasksByCategory(ue,cat.getId()));
+
+    }
+    @Test
+    public void findNotOverdueByCategoryTest(){
+        UserDto user=new UserDto(1, "firstuser@gmail.com", "David Seaman","first123" );
+        UserEntity ue=new UserEntity(user);
+
+        CategoryDto cat = new CategoryDto(1, "name", "descr", ue.getId());
+        CategoryDto cat2 = new CategoryDto(2, "house", "make", ue.getId());
+        CategoryEntity category=new CategoryEntity(cat, ue.getId());
+        CategoryEntity category2=new CategoryEntity(cat2, ue.getId());
+        TaskEntity dto2=new TaskEntity(5, "write", "3k", LocalDate.of(2022, 9, 8),  false, ue, category);
+        TaskEntity dto=new TaskEntity(2, "read", "500 pages", LocalDate.of(2021, 1, 8),false, ue, category2);
+        TaskEntity dto3=new TaskEntity(3, "fly", "200 miles", LocalDate.of(2021, 2, 3),true, ue, category);
+        List<TaskEntity> inc = List.of(dto2, dto, dto3);
+
+        when(repository.findNotOverdueTasksByCategory(ue, cat2.getId(),LocalDate.of(2022, 7, 8)))
+                .thenReturn(inc);
+        assertEquals(inc, service.findUserNotOverdueTasksByCategory(ue, cat2.getId()));
+
+    }
+    @Test
+    public void findCompletedByDatesTest(){
+        UserDto user=new UserDto(1, "firstuser@gmail.com", "David Seaman","first123" );
+        UserEntity ue=new UserEntity(user);
+
+        CategoryDto cat = new CategoryDto(1, "name", "descr", ue.getId());
+        CategoryDto cat2 = new CategoryDto(2, "house", "make", ue.getId());
+        CategoryEntity category=new CategoryEntity(cat, ue.getId());
+        CategoryEntity category2=new CategoryEntity(cat2, ue.getId());
+        TaskEntity dto2=new TaskEntity(5, "write", "3k", LocalDate.of(2022, 9, 8),  true, ue, category);
+        TaskEntity dto=new TaskEntity(2, "read", "500 pages", LocalDate.of(2021, 1, 8),true, ue, category2);
+        TaskEntity dto3=new TaskEntity(3, "fly", "200 miles", LocalDate.of(2018, 2, 3),true, ue, category);
+        List<TaskEntity> inc = List.of(dto2, dto, dto3);
+
+        when(repository.findCompletedTasksByDates(ue, LocalDate.of(2018, 1,1),LocalDate.of(2022, 12,12) ))
+                .thenReturn(inc);
+        assertEquals(inc, service.findUserCompletedTasksByDates(ue,LocalDate.of(2018, 1,1),LocalDate.of(2022, 12,12) ));
+
+    }
+
+
 }
