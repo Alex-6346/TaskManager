@@ -1,7 +1,7 @@
-package com.naukma.taskManager.repository;
+package com.naukma.taskManager.reposerv;
 import com.naukma.taskManager.entity.*;
+import com.naukma.taskManager.repository.CategoriesRepository;
 import com.naukma.taskManager.service.CategoriesService;
-import com.naukma.taskManager.service.TasksService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +21,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class CategoryRepoTest {
+public class CategoryRepoServiceTest {
 
     @Autowired
     private CategoriesService service;

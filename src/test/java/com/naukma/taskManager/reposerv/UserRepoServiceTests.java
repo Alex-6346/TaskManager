@@ -1,7 +1,8 @@
-package com.naukma.taskManager.repository;
+package com.naukma.taskManager.reposerv;
 
 import com.naukma.taskManager.entity.UserDto;
 import com.naukma.taskManager.entity.UserEntity;
+import com.naukma.taskManager.repository.UsersRepository;
 import com.naukma.taskManager.service.UsersService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class UserRepoTests {
+public class UserRepoServiceTests {
     @Autowired
     private UsersService service;
     @MockBean
