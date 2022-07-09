@@ -24,7 +24,6 @@ public interface CategoriesRepository extends JpaRepository<CategoryEntity, Inte
 
     CategoryEntity saveAndFlush(CategoryEntity categoryEntity);
 
-
     @Query("SELECT c.name FROM CategoryEntity c " +
             "where c.userId=:userId")
     List<String> namesByUser(long userId);
@@ -33,9 +32,16 @@ public interface CategoriesRepository extends JpaRepository<CategoryEntity, Inte
 //            "where c.userId=:userId and c.name=:name")
 //    CategoryEntity findCategoryByName(@Param("name") String name, @Param("userID") long userId);
 
+
+    @Modifying
+    @Query("delete from TaskEntity t where t.category.id=:id")
+    void deleteCategoryTasks(@Param("id") Long id);
+
     @Modifying
     @Query("delete from CategoryEntity c where c.id=:id")
     void deleteCategory(@Param("id") Long id);
+
+
 
     Optional<CategoryEntity>findById(long id);
     Optional<CategoryEntity>findByName(String name);
