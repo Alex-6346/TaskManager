@@ -1,12 +1,13 @@
 package com.naukma.taskManager.controller;
 
 
-import com.naukma.taskManager.entity.*;
-import com.naukma.taskManager.service.*;
+import com.naukma.taskManager.entity.CategoryDto;
+import com.naukma.taskManager.entity.CategoryEntity;
+import com.naukma.taskManager.entity.UserEntity;
+import com.naukma.taskManager.service.CategoriesService;
+import com.naukma.taskManager.service.UsersService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.tool.schema.internal.exec.ScriptTargetOutputToFile;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.annotation.Id;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -52,25 +53,6 @@ public class CategoriesController {
         UserEntity user = usersService.getUserByEmail(email);
         categoryDto.setUser(user.getId());
 
-//        final Set<ConstraintViolation<CategoryDto>> validationResult = validator.validate(categoryDto);
-//        final List<String> errors = validationResult.stream()
-//                .map(errorField -> "Field [" + errorField.getPropertyPath() + "] is invalid. Validation error: " + errorField.getMessage())
-//                .collect(Collectors.toList());
-//
-//        if (!errors.isEmpty()) {
-//            return ResponseEntity.badRequest()
-//                    .body(errors);
-//        }
-//
-//
-
-
-//        if(categoriesService.namesByUser(user).contains(categoryDto.getName())) {
-//            errors.add("User already have category with this name");
-//            return ResponseEntity.badRequest()
-//                    .body(errors);
-//        }
-
         ResponseEntity<?> error = validateCategory(categoryDto, user, false);
         if(error != null){
             return error;
@@ -105,7 +87,6 @@ public class CategoriesController {
         return null;
     }
 
-//    @RequestMapping(value="/show/{id}", method=RequestMethod.GET)
     @GetMapping( "/{id}")
     public String categoryPage(Model model, @PathVariable(value="id") long id){
         model.addAttribute("category", new CategoryDto(categoriesService.getCategoryById(id)));
@@ -145,17 +126,6 @@ public class CategoriesController {
         return  ResponseEntity.status(HttpStatus.OK).body(categoryDto);
     }
 
-//    @GetMapping("/view")
-//    public String viewCategories(Model model) {
-//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        String email = ((UserDetails) principal).getUsername();
-//        UserEntity user = usersService.getUserByEmail(email);
-//
-//        List<CategoryEntity> categoriesList = categoriesService.findAllCategoriesByUser(user);
-//        model.addAttribute("categoriesInfo", categoriesList);
-//
-//        return "categories-view";
-//    }
 
     @GetMapping("/names")
     @ResponseBody

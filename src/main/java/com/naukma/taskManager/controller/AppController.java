@@ -1,8 +1,6 @@
 package com.naukma.taskManager.controller;
 
 
-import com.naukma.taskManager.entity.CategoryDto;
-import com.naukma.taskManager.entity.CategoryEntity;
 import com.naukma.taskManager.entity.UserEntity;
 import com.naukma.taskManager.service.CategoriesService;
 import com.naukma.taskManager.service.UsersService;
